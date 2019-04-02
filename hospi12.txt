@@ -1,0 +1,811 @@
+#include <iostream>
+#include <fstream>
+#include<string>
+#include <stdlib.h>
+#include <cstring>
+#include<sstream>
+#include<ctype.h>
+#include<iomanip>
+#include <ctime>
+#include <conio.h>
+#include <vector>
+#include<math.h>
+using namespace std;
+void login();
+string enterpwd();
+void newscr(string);
+string mrms(char);
+char entergender();
+void billing();
+class Recep;
+class Admin;
+class Doctor;
+string randomno(int,int);
+int main()
+{
+    login();
+    return 0;
+}
+void newscr(string s)
+{
+    system("cls");cout<<"\t\t\t\t XXX HOSPITAL\n";for(int i=0;i<80;i++)cout<<"-";cout<<s<<endl;for(int i=0;i<80;i++)cout<<"-";
+}
+string randomno(int l=100,int u=900)
+{
+    string s;srand(time(0));int i=(l+(rand()%(u-l+1)));stringstream ss;ss<<i;ss>>s;return s;
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static vector < vector <int> > patq(5);
+int line(int x,int pid)
+{patq[x].push_back(pid);return patq[x].size();}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class Pat
+{
+    int id,age,c3;float bill;string name,issue,remedy;char gender;
+     void updatereport(int);
+public :
+    static int patid;
+    int searchpat(int);
+    void idpatinfo();
+    void allpatinfo();
+    void newpat();
+    void alldocpatinfo(int);
+    void patreport(int);
+    void delpat(Pat*);
+};
+
+int Pat::patid=0;
+Pat patarray[10];
+
+void Pat::newpat()
+{
+    int c1,c2,lno;float sum=0,dis;
+    id =patid;
+    cout<<"\n\tpatient ID\t-\t"<<id;
+    cout<<"\n\tname\t\t-\t";getline(cin,name);getline(cin,name);
+    gender=entergender();remedy=" ";
+    cout<<"\tage\t\t-\t";cin>>age;if(age<13||age>55)dis=0.6;else dis=1;
+    cout<<"problem discription\t-\t";getline(cin,issue);getline(cin,issue);//cin.getline(issue,11);cin.getline(issue,11);
+    cout<<"\n(1)checkup ";cin>>c1;if(c1==1)
+    {cout<<"which kinda doctor ? \n(1)Phycn\n(2)Alg\n(3)Opth\n(4)Phys";cin>>c3;lno=line(c3,patid);sum=sum+20;}else lno=0;
+    cout<<"\n(2)Test ";cin>>c1;
+                      if(c1==2){
+                         cout<<":\n\t(1) x-ray\n\t(2) blood test\n\t(3) CT Scan\n\t(4) MRI\n\t(0) Done\n";
+                         while(c2!=0){cin>>c2;switch(c2){
+                            case 1:
+                            sum+=700;break;
+                            case 2:
+                            sum+=100;break;
+                            case 3:
+                            sum+=1200;break;
+                            case 4:
+                            sum+=1000;break;
+                            case 0:break;
+                            default:
+                            cout<<"enter from provided choices";}}}
+    bill=sum*dis;cout<<"\nTotal Bill : "<<bill;if(lno!=0)cout<<"\nLine no. :"<<lno;
+    getch();
+    if(bill==0)delpat(this);
+}
+void Pat::delpat(Pat *a)
+{
+    delete a;
+}
+void Pat::idpatinfo()
+{
+    int id,f=0;
+    cout<<"enter id of patient  ";cin>>id;
+    cout<<"ID\tNAME\t\tAGE\tPROBLEM\t\tBILL\n";
+    if(patid==0){cout<<"-\t-\t\t-\t-";cout<<"\n\nNo patient is there";}
+    else
+    {
+        for(int i=1;i<=patid&&f==0;i++)
+            if(patarray[i].id==id){cout<<endl<<patarray[i].id<<"\t"<<mrms(patarray[i].gender)<<patarray[i].name<<"\t\t"<<patarray[i].age<<"\t"<<patarray[i].issue<<"\t\t"<<patarray[i].bill;f=1;}
+        if(f==0)cout<<"\nID not found\n";
+    }
+    getch();
+}
+
+void Pat::allpatinfo()
+{
+
+    cout<<"ID\tNAME\t\tAGE\tPROBLEM\t\tBILL\n";
+    if(patid==0){cout<<"-\t-\t\t-\t-";cout<<"\n\nNo patient is there";}
+    else
+    {  for(int i=1;i<=patid;i++)
+       cout<<endl<<patarray[i].id<<"\t"<<mrms(patarray[i].gender)<<patarray[i].name<<"\t\t"<<patarray[i].age<<"\t"<<patarray[i].issue<<"\t\t"<<patarray[i].bill;}
+    getch();
+}
+
+void Pat::alldocpatinfo(int x)
+{
+
+    cout<<"ID\tNAME\t\tAGE\tPROBLEM\n";
+    if(patq[x].size()==0){cout<<"-\t-\t\t-\t-";cout<<"\n\nNo patient is there";}
+    else
+    {  for(int i=1;i<=patid;i++)
+       if(x==patarray[i].c3)cout<<endl<<patarray[i].id<<"\t"<<mrms(patarray[i].gender)<<patarray[i].name<<"\t\t"<<patarray[i].age<<"\t"<<patarray[i].issue;}
+    getch();
+}
+
+int Pat::searchpat(int idp)
+{int x=0;
+    if(patid==0)x=-1;
+    else    for(int i=1;i<=patid;i++)if(patarray[i].id==idp)x=i;
+   return x;
+}
+void Pat::patreport(int i)
+{
+    newscr("PATIENT REPORT");
+    cout<<"\n\tID\t\t:\t"<<patarray[i].id;
+    cout<<"\n\tNAME\t\t:\t"<<patarray[i].name;
+    cout<<"\n\tGENDER\t\t:\t"<<patarray[i].gender;
+    cout<<"\n\tAGE\t\t:\t"<<patarray[i].age;
+    cout<<"\n\tBILL\t\t:\t"<<patarray[i].bill;
+    cout<<"\n\tSYMPTOMS\t:\t"<<patarray[i].issue;
+    cout<<"\n\tPRISCRIPTIONS\t:\t"<<patarray[i].remedy;
+    cout<<"\n\n(1)UPDATE \n";int ch;cin>>ch;if(ch==1)updatereport(i);
+}
+
+void Pat::updatereport(int i)
+{
+   string s,nl="\n\t\t\t\t";
+   cout<<"\t\t:\n\t";
+   getline(cin,s);getline(cin,s);
+   (patarray[i].remedy).append(nl);
+   (patarray[i].remedy).append(s);
+
+}
+/////////////////////////////////////////////////////////////////////////////////////
+
+ ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class Doctor:virtual Pat
+{   static int doctoridd;static int doctorid;
+    int id,spc,salary;char gender;string fname,lname,password,username,phno;
+public:
+    int doctorlogin(string);
+    void wdoctor(int);
+    void adddoctor();
+    void firedoctor();
+    void docmyinfo(int);
+    void docupdate(int);
+    void docmeds(int);
+    void docpatinfo(int);
+    void namedocinfo(int);
+    void alldocinfo();
+    void spcdocinfo(int);
+    string spclist(int);
+};
+
+int Doctor::doctorid=0;
+int Doctor::doctoridd=100;
+Doctor docarray[10];
+Doctor dx;
+
+void Doctor::alldocinfo()
+{   newscr("ADMINISTRATOR");
+        cout<<"Main Menu > Doctor Section > View all doctor's info\n\n";
+        if(doctorid==0)cout<<"No doctors in hospital !!";
+        else
+        {  cout<<"ID\tNAME\tGENDER\tSPECIALIZATION\tANNUAL SALARY\n\n";
+           for(int i=1;i<=doctorid;i++)
+               cout<<docarray[i].id<<"\t"<<docarray[i].fname<<" "<<docarray[i].lname<<"\t"<<docarray[i].gender<<"\t"<<spclist(docarray[i].spc)<<"\t"<<docarray[i].salary<<endl;}
+    getch();
+}
+
+
+
+void Doctor::spcdocinfo(int fv)
+{   int f=0,x;
+    cout<<"SPECIALIZATION LIST\n(1)Physician\n(2)Allergist\n(3)Ophthalmologist\n(4)Physiatrist\n";
+    if(doctorid==0)cout<<"\nNo doctors in hospital !!";
+    else
+    { cout<<"enter specialization - ";cin>>x;
+      cout<<"\nID\tNAME\tGENDER\tSPECIALIZATION\tCONTACT NO.";if(fv==1)cout<<"\tANNUAL SALARY\n\n";
+      for(int i=1;i<=doctorid;i++)
+      if(x==docarray[i].spc){f=1;cout<<endl<<docarray[i].id<<"\t"<<docarray[i].fname<<"\t"<<docarray[i].gender<<"\t"<<spclist(docarray[i].spc)<<"\t"<<docarray[i].phno;if(fv==1)cout<<"\t"<<docarray[i].salary;}
+      if(f==0){cout<<"\n-\t-\t-\t-\t";if(fv==1)cout<<"\t-";cout<<endl;cout<<"There is no Doctor for "<<spclist(x)<<" in this Hospital";}
+    }
+    getch();
+}
+string Doctor::spclist(int x)
+{   string m;
+    switch(x)
+    { case 1:   m="Physician";break;
+      case 2:   m="Allergist";break;
+      case 3:   m="Ophthalmologist";break;
+      case 4:   m="Physiatrist";break;
+      default:  m="ERROR";
+    }return m;
+}
+
+void Doctor::namedocinfo(int fv)
+{
+    string nxx,nx;int f=0;
+    if(doctorid==0)cout<<"\nNo doctors in hospital !!";
+    else
+    {
+      cout<<"\nenter name of the doctor\t-\t";cin>>nx;//cin.getline(nx1,20);nx=nx1;//
+      cout<<"\nID\tNAME\tGENDER\tSPECIALIZATION\tCONTACT NO.";if(fv==1)cout<<"\tANNUAL SALARY\n\n";
+      for(int i=1;i<=doctorid;i++)
+      {string s=" ";s.append(docarray[i].fname);s.append(docarray[i].lname);
+          if(nx.compare(docarray[i].fname)==0||nx.compare(docarray[i].lname)==0||nx.compare(s)==0)
+           {f=1;cout<<endl<<docarray[i].id<<"\t"<<docarray[i].fname<<" "<<docarray[i].lname<<"\t"<<docarray[i].gender<<"\t"<<spclist(docarray[i].spc)<<"\t\t"<<docarray[i].phno;if(fv==1)cout<<"\t"<<docarray[i].salary;}
+      }
+      if(f==0){cout<<"\n-\t-\t-\t";if(fv==1)cout<<"-";cout<<endl;cout<<"There is no Doctor named "<<nx<<" in this Hospital";}
+    }
+    getch();
+}
+
+void Doctor::adddoctor()
+{       newscr("ADMINISTRATOR");
+        cout<<"Main Menu > Doctor Section > Add new doctor\n\n";
+        doctorid=doctorid+1;
+        id=(++doctoridd);string doc="doc";
+        cout<<"\tid\t\t-\t"<<id<<"\n";
+        cout<<"\tfirst name\t-\t";cin>>fname;cout<<"\tlast name\t-\t";cin>>lname;
+        gender=entergender();
+        cout<<"\tcontact number\t-\t";cin>>phno;while(phno.length()!=5){cout<<"(enter 5 digit number)\t\t";cin>>phno;}
+        cout<<"\tSpecialization\t:";
+        cout<<"\n(1)Physician\n(2)Allergist\n(3)Ophthalmologist\n(4)Physiatrist\t\t-\t";//spc=spcl();
+        cin>>spc;cout<<"("<<spclist(spc)<<")\n";
+        cout<<"\tAnnual Salary\t-\t";cin>>salary;
+        username=doc.append(fname);
+        password=randomno();
+        cout<<"\n\t*";
+        cout<<mrms(gender)<<fname<<" is now a doctor at XXX Hospital";
+        // ofstream w1("doctorinfo.txt");
+       // w1<<id<<" "<<fname<<" "<<gender<<endl;
+       cout<<"\n\t with USERNAME - "<<username<<" and  PASSWORD - "<<password;
+        //w1.close();
+        getch();
+}
+
+void Doctor::firedoctor()
+{   //docarray[x].close;
+    newscr("ADMINISTRATOR");
+        cout<<"Main Menu > Doctor Section > Fire Doctor\n\n";
+    int x,f=-1,i,j,y;
+    if(doctorid==0){cout<<"There is no doctor in your hospital to fire ";}
+    else
+    {
+        cout<<"ID of the poor doctor u wanna fire - ";cin>>x;
+        for(i=1;i<=doctorid;i++)if(docarray[i].id==x)f=i;
+        if(f==-1)cout<<"this ID is not found";
+        else
+        {
+             cout<<"Fire ";string s1,s2;
+             s2=s1.append(mrms(docarray[f].gender).append(docarray[f].fname));cout<<s2<<" ?\n(1-yes) ";cin>>y;
+             if(y==1)
+             {
+                  //for(i=0;i<doctorid&&f==-1;i++){if(docarray[i].id==x){f=i;cout<<"\nsearching done"<<i;}}
+                  for(j=f+1;j<=doctorid;j++){docarray[j-1]=docarray[j];cout<<endl<<j;}cout<<"\nshifting done"<<i;
+                  doctorid--;
+                  newscr("ADMINISTRATOR");
+                  cout<<"Main Menu > Doctor Section > Fire Doctor\n\n";
+                  cout<<s2<<" won't work here now.";
+             }
+        }
+    }
+    getch();
+}
+
+int Doctor::doctorlogin(string u)
+{
+    int r=0;string pwd;cout << "PASSWORD    -  ";pwd=enterpwd();
+    for(int i=1;i<=doctorid;i++)
+        {if(((docarray[i].username).compare(u)==0)&&(docarray[i].password==pwd))r=i;}
+    return r;/* int r=0;string pwd;
+    for(int i=1;i<=doctorid;i++){if((docarray[i].username).compare(u)==0)
+    {cout << "PASSWORD    -  ";pwd=enterpwd();if(docarray[i].password==pwd)r=i;}}return r;*/
+}
+
+void Doctor::wdoctor(int i)
+{
+     newscr("DOCTOR");
+        cout<<mrms(docarray[i].gender)<<docarray[i].fname<<"\nMain Menu\n\n";
+    int cd;
+    cout<<"(1)My Info\n(2)My Patients\n(3)Medicine List\n(4)Logout\n";cin>>cd;
+    switch(cd)
+    {
+    case 1:
+        docmyinfo(i);break;
+    case 2:
+        docpatinfo(i);wdoctor(i);break;
+    case 3:
+        docmeds(i);break;
+    case 4:
+        login();break;
+    default:
+        wdoctor(i);
+    }
+}
+
+void Doctor::docpatinfo(int i)
+{
+    newscr("DOCTOR");
+    cout<<mrms(docarray[i].gender)<<docarray[i].fname<<"\nMain Menu > Patient Section\n\n";
+    cout<<"(1)My Patients\n(2)Patient Report\n(3)Back\n";int ch,c;cin>>ch;
+    switch(ch)
+    {
+    case 1:
+        newscr("DOCTOR");
+        cout<<mrms(docarray[i].gender)<<docarray[i].fname<<"\nMain Menu > Patient Section > My All Patients\n\n";
+        alldocpatinfo(docarray[i].spc);docpatinfo(i);break;
+    case 2:
+        newscr("DOCTOR");
+        cout<<mrms(docarray[i].gender)<<docarray[i].fname<<"\nMain Menu > Patient Section > Patient Report\n\n";
+        cout<<"enter ID of Patient : ";cin>>c;if(searchpat(c)<1)cout<<"ID not found";else patreport(searchpat(c));getch();
+        docpatinfo(i);break;
+    case 3:
+        wdoctor(i);break;
+    default :
+        docpatinfo(i);
+    }
+}
+
+void Doctor::docmyinfo(int x)
+{
+     newscr("DOCTOR");
+        cout<<mrms(docarray[x].gender)<<docarray[x].fname<<"\nMain Menu > My Info\n\n";
+    int chp;
+    cout<<"ID\t\t-\t"<<docarray[x].id<<"\nGender\t\t-\t"<<docarray[x].gender<<"\ncontact number\t-\t"<<docarray[x].phno<<"\nAnnual Salary\t-\t"<<docarray[x].salary<<"\nUser Name\t-\t"<<docarray[x].username<<"\nPassword\t-\t"<<docarray[x].password<<endl;
+    cout<<"\n(1)Wanna update your profile ";cin>>chp;
+    if(chp==1)docupdate(x);
+    else wdoctor(x);
+}
+
+void Doctor::docupdate(int x)
+{   int chp;
+    cout<<"\n\t(1)change your password\n\t(2)change contact number\n";cin>>chp;
+    if(chp==1)
+    {   string npwd;
+        cout<<"\tenter new password :";cin>>npwd;
+        docarray[x].password=npwd;
+        newscr("DOCTOR");
+        cout<<mrms(docarray[x].gender)<<docarray[x].fname<<"\nMain Menu > My Info > Update\n\n";
+        cout<<mrms(docarray[x].gender)<<docarray[x].fname<<" your Password is updated";
+    }
+    if(chp==2)
+    {   string nphno;
+        cout<<"enter new contact number ";cin>>nphno;while(nphno.length()!=5){cout<<"(enter 5 digit number)\t\t";cin>>nphno;}
+        docarray[x].phno=nphno;
+        newscr("RECEPTION");
+        cout<<mrms(docarray[x].gender)<<docarray[x].fname<<"\nMain Menu > My Info > Update\n\n";
+        cout<<mrms(docarray[x].gender)<<docarray[x].fname<<" your contact number is updated";
+    }
+    getch();wdoctor(x);
+}
+void Doctor::docmeds(int x)
+{
+    newscr("DOCTOR");
+    cout<<mrms(docarray[x].gender)<<docarray[x].fname<<"\nMain Menu > Drugs\n\n";
+    ofstream meds("drugs.txt");
+    meds<<"headache"<<" "<<"qwe9"<<endl;
+    meds<<"backpain"<<" "<<"ert6"<<endl;
+    meds<<"fever"<<" "<<"fxj3"<<endl;
+    meds<<"laziness"<<" "<<"znh5"<<endl;
+    meds<<"dengue"<<" "<<"oys8"<<endl;
+    meds.close();
+    string pain,med;
+    ifstream medi("drugs.txt");
+    cout<<"PAIN\t\tDRUG\n"<<endl;
+    while(medi>>pain>>med){cout<<pain<<"\t\t"<<med<<endl;}
+    getch();
+    wdoctor(x);
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class Recep:virtual Doctor,virtual Pat
+{
+    int id,salary;string fname,lname,username,phno,password;char gender;static int recepidd;
+public:
+    static int recepid;
+    int receplogin(string);
+    void wrecep(int);
+    void addrecep();
+    void firerecep();
+    void allrecepinfo();
+    void namerecepinfo();
+    void recepmyinfo(int);
+    void recepupdate(int);
+    void rdocinfo(int);
+    void receppatmenu(int);
+    void receppatinfo(int);
+    void recepnewpat(int);
+};
+
+int Recep::recepid=0;
+int Recep::recepidd=100;
+Recep receparray[10];
+
+int Recep::receplogin(string u)
+{
+    int r=0;string pwd;cout << "PASSWORD    -  ";pwd=enterpwd();
+    for(int i=1;i<=recepid;i++)
+        {if(((receparray[i].username).compare(u)==0)&&(receparray[i].password==pwd))r=i;}
+    return r;
+}
+void Recep::addrecep()
+{
+    newscr("ADMINISTRATOR");
+        cout<<"Main Menu > Desk Section > add new receptionist\n\n";
+    recepid=recepid+1;
+        id=++recepidd;string rcp="rcp";
+        cout<<"\tid\t\t-\t"<<id<<"\n";
+        cout<<"\tfirst name\t-\t";cin>>fname;cout<<"\tlast name\t-\t";cin>>lname;
+        gender=entergender();
+        cout<<"\tcontact number\t-\t";cin>>phno;while(phno.length()!=5){cout<<"(enter 5 digit number)\t\t";cin>>phno;}
+        cout<<"\tsalary\t\t-\t";cin>>salary;
+        username=rcp.append(fname);
+        password=randomno();
+        cout<<"\n\t*";
+        cout<<mrms(gender)<<fname<<" is now a receptionist at XXX Hospital";
+        cout<<"\n\n\t  USERNAME - "<<username<<" and  PASSWORD - "<<password;
+        getch();
+}
+
+void Recep::allrecepinfo()
+{
+    newscr("ADMINISTRATOR");
+        cout<<"Main Menu > Desk Section > receptionist's info\n\n";
+         if(recepid==0)cout<<"No receptionist in hospital !!";
+        else
+        {  cout<<"ID\tNAME\tGENDER\tCONTACT NO.\tSALARY\n\n";
+           for(int i=1;i<=recepid;i++)
+               cout<<receparray[i].id<<"\t"<<receparray[i].fname<<" "<<receparray[i].lname<<"\t"<<receparray[i].gender<<"\t"<<receparray[i].phno<<"\t\t"<<receparray[i].salary<<endl;}
+    getch();
+}
+
+void Recep::namerecepinfo()
+{
+    newscr("ADMINISTRATOR");
+    cout<<"Main Menu > Desk Section > receptionist's info\n\n";
+    string nx;int f=0;
+    if(recepid==0)cout<<"No receptionist in hospital !!";
+    else
+    {
+      cout<<"enter name of the receptionist\t-\t";cin>>nx;//getline(cin,nx);
+      cout<<"ID\tNAME\tGENDER\tCONTACT NO.\tSALARY\n\n";
+      for(int i=1;i<=recepid;i++)
+      {string s=" ";s.append(receparray[i].fname);s.append(receparray[i].lname);
+          if(nx.compare(receparray[i].fname)==0||nx.compare(receparray[i].lname)==0||nx.compare(s)==0)
+           {f=1;cout<<receparray[i].id<<"\t"<<receparray[i].fname<<" "<<receparray[i].lname<<"\t"<<receparray[i].gender<<"\t"<<receparray[i].phno<<"\t"<<receparray[i].salary<<endl;}
+      }
+      if(f==0){cout<<"-\t-\t-\t"<<endl;cout<<"There is no Receptionist named "<<nx<<" in this Hospital";}
+    }
+    getch();
+}
+void Recep::firerecep()
+{
+    newscr("ADMINISTRATOR");
+        cout<<"Main Menu > Desk Section > Fire Receptionist\n";
+    int x,f=-1,i,j,y;
+    if(recepid==0){cout<<"\nThere is no receptionist in your hospital to fire ";}
+    else
+    {
+        cout<<"ID of the poor desk worker u wanna fire - ";cin>>x;
+        for(i=1;i<=recepid;i++)if(receparray[i].id==x)f=i;
+        if(f==-1)cout<<"this ID is not found";
+        else
+        {
+             cout<<"Fire ";string s1,s2;
+             s2=s1.append(mrms(receparray[f].gender).append(receparray[f].fname));cout<<s2<<" ?\n(1-yes) ";cin>>y;
+             if(y==1)
+             {
+                  for(j=f+1;j<=recepid;j++){receparray[j-1]=receparray[j];cout<<endl<<j;}
+                  recepid--;
+                  newscr("ADMINISTRATOR");
+                  cout<<"Main Menu > Desk Section > Fire Receptionist\n\n";
+                  cout<<s2<<" won't work here now.";
+             }
+        }
+    }
+    getch();
+}
+void Recep::wrecep(int x)
+{
+    newscr("RECEPTION");
+    cout<<mrms(receparray[x].gender)<<receparray[x].fname<<"\nMain Menu\n\n";
+    int ch;
+    cout<<"(1)My Info\n(2)Patient\n(3)Doctor\n(4)Logout\n";cin>>ch;
+    switch(ch)
+    {   case 1:
+          recepmyinfo(x);break;
+        case 2:
+          receppatmenu(x);break;
+        case 3:
+          rdocinfo(x);break;
+        case 4:
+          login();break;
+        default:
+          wrecep(x);
+    }
+      getch();
+}
+
+void Recep::rdocinfo(int x)
+{
+ newscr("RECEPTION");
+    cout<<mrms(receparray[x].gender)<<receparray[x].fname<<"\nMain Menu > Doctor Section\n\n";
+    int ch;
+    cout<<"(1)find Doctor by specialization\n(2)find Doctor by Name\n(3)Back\n";cin>>ch;
+    switch(ch)
+    {
+        case 1:
+          newscr("RECEPTION");
+          cout<<mrms(receparray[x].gender)<<receparray[x].fname<<"\nMain Menu > Doctor Section > find Doctor by specialization\n\n";
+          spcdocinfo(0);rdocinfo(x);break;
+        case 2:
+          newscr("RECEPTION");
+          cout<<mrms(receparray[x].gender)<<receparray[x].fname<<"\nMain Menu > Doctor Section > find Doctor by Name\n\n";
+          namedocinfo(0);rdocinfo(x);break;
+        case 3:
+          wrecep(x);break;
+        default:
+          rdocinfo(x);
+    }getch();
+}
+void Recep::receppatmenu(int x)
+{
+    int ch;Pat p;
+     newscr("RECEPTION");
+     cout<<mrms(receparray[x].gender)<<receparray[x].fname<<"\nMain Menu > Patient Desk\n\n";
+     cout<<"(1)View Patient Info\n(2)Add Patient\n(3)Back\n";cin>>ch;
+    switch(ch)
+    {
+    case 1:
+        receppatinfo(x);
+        break;
+    case 2:
+        recepnewpat(x);
+        break;
+    default:
+        wrecep(x);
+    }
+}
+void Recep::recepmyinfo(int x)
+{
+    newscr("RECEPTION");
+    cout<<mrms(receparray[x].gender)<<receparray[x].fname<<"\nMain Menu > My Info\n\n";
+    int c1;
+    cout<<"ID\t\t-\t"<<receparray[x].id<<"\nGender\t\t-\t"<<receparray[x].gender<<"\ncontact number\t-\t"<<receparray[x].phno<<"\nAnnual Salary\t-\t"<<receparray[x].salary<<"\nUser Name\t-\t"<<receparray[x].username<<"\nPassword\t-\t"<<receparray[x].password<<endl;
+    cout<<"\n(1)Wanna update your profile ";cin>>c1;
+    if(c1==1)recepupdate(x);
+    else wrecep(x);
+}
+
+void Recep::recepupdate(int x)
+{   int chp;
+    cout<<"\n\t(1)change your password\n\t(2)change contact number\n";cin>>chp;
+    if(chp==1)
+    {   string npwd;
+        cout<<"\tenter new password :";cin>>npwd;
+        receparray[x].password=npwd;
+        newscr("RECEPTION");
+        cout<<mrms(receparray[x].gender)<<receparray[x].fname<<"\nMain Menu > My Info > Update\n\n";
+        cout<<mrms(receparray[x].gender)<<receparray[x].fname<<" your Password is updated";
+    }
+    if(chp==2)
+    {   string nphno;
+        cout<<"enter new contact number ";cin>>nphno;while(nphno.length()!=5){cout<<"(enter 5 digit number)\t\t";cin>>nphno;}
+        receparray[x].phno=nphno;
+        newscr("RECEPTION");
+        cout<<mrms(receparray[x].gender)<<receparray[x].fname<<"\nMain Menu > My Info > Update\n\n";
+        cout<<mrms(receparray[x].gender)<<receparray[x].fname<<" your contact number is updated";
+    }
+    getch();wrecep(x);
+}
+void Recep::recepnewpat(int x)
+{
+    newscr("RECEPTIONIST");
+    cout<<mrms(receparray[x].gender)<<receparray[x].fname<<"\nMain Menu > Patient Section > New Patient\n\n";
+   patarray[(++patid)].newpat();
+    receppatmenu(x);
+}
+ void Recep::receppatinfo(int x)
+ {
+     newscr("RECEPTION");
+     cout<<mrms(receparray[x].gender)<<receparray[x].fname<<"\nMain Menu > Patient > Patient Info\n\n";
+     cout<<"(1)view all patient info\n(2)find a patient\n";int ch;cin>>ch;
+     if(ch==1)allpatinfo();
+     if(ch==2)idpatinfo();
+     receppatmenu(x);
+ }
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class Admin:virtual Doctor,virtual Recep
+{
+    static int idoc,irecep;
+public:
+    int adminlogin(string);
+    void wadmin();
+    void docmenu();
+    void doctorinfo();
+    void recepmenu();
+    void recepinfo();
+};
+int Admin::idoc=1;
+int Admin::irecep=1;
+
+int Admin::adminlogin(string u)
+{
+         string password;
+         cout << "PASSWORD    -  ";password=enterpwd();
+         if(u.compare("admin")==0&&password.compare("major")==0)
+            return 1;
+         else return 0;
+}
+
+void Admin:: wadmin()
+{
+        int c;
+        newscr("ADMINISTRATOR");
+        cout<<"Main Menu\n\n";
+        cout<<"(1)doctor\n(2)reception\n(3)logout\n";//try{
+        cin >>c;
+        switch(c)
+        {case 1:
+               docmenu();wadmin();
+               break;
+           case 2:
+                recepmenu();wadmin();
+               break;
+          case 3:
+              main(); //cq=3;
+              break;
+          default:
+            wadmin();
+        }                    //if(isdigit(c)||c!=1||c!=0)throw 1;}catch(...){cout<<"enter a number only";wadmin();}
+}
+
+void Admin::docmenu()
+{
+        int ch;
+        newscr("ADMINISTRATOR");
+        cout<<"Main Menu > Doctor Section\n\n";
+                  cout<<"(1)view doctor info\n(2)add new doctor\n(3)fire doctor\n(4)Back\n";
+                  /*try{*/cin>>ch;/*if(isnumber(!cd))throw 7;}catch(...){cout<<"eneter a number ";docmenu(d1);}*/cout<<endl;
+                  switch(ch)
+                 {case 1:
+                    doctorinfo();    break;
+                  case 2:
+                    docarray[idoc].adddoctor();idoc++; docmenu();     break;
+                  case 3:
+                    firedoctor(); docmenu(); break;
+                  case 4:
+                    wadmin();     break;
+                  default :
+                     docmenu();    break;
+                 }
+
+}
+void Admin::doctorinfo()
+{
+    newscr("ADMINISTRATOR");
+        cout<<"Main Menu > Doctor Section > view doctor info\n\n";
+        cout<<"(1)all doctor\n(2)by specialization\n(3)by Name\n(4)Back\n";
+                 int ch;cin>>ch;cout<<endl;
+                  switch(ch)
+                 {case 1:
+                    alldocinfo();doctorinfo();    break;
+                  case 2:
+                    newscr("ADMINISTRATOR");
+                    cout<<"Main Menu > Doctor Section > Doctor's info \n\n";
+                    spcdocinfo(1);doctorinfo();   break;
+                case 3:
+                    newscr("ADMINISTRATOR");
+                    cout<<"Main Menu > Doctor Section > Doctor's info \n\n";
+                    namedocinfo(1);doctorinfo();   break;
+                  case 4:
+                    docmenu();     break;
+                  default :
+                    doctorinfo();    break;
+                 }
+}
+
+void Admin::recepmenu()
+{
+        int cr;
+        newscr("ADMINISTRATOR");
+        cout<<"Main Menu > Desk Section\n\n";
+                  cout<<"(1)view receptionist info\n(2)add new receptionist\n(3)fire receptionist\n(4)Back\n";
+                  cin>>cr;
+                  switch(cr)
+                 {case 1:
+                    recepinfo();    break;
+                  case 2:
+                    receparray[irecep].addrecep();irecep++;   recepmenu();  break;
+                  case 3:
+                    firerecep(); irecep--;recepmenu();   break;
+                  case 4:
+                    wadmin();     break;
+                  default :
+                     recepmenu();    break;
+                 }
+
+}
+
+void Admin::recepinfo()
+{
+    newscr("ADMINISTRATOR");
+        cout<<"Main Menu > Desk Section > view Receptionist info\n\n";
+        cout<<"(1)all Receptionist\n(2)by Name\n(3)Back\n";
+                 int ch;cin>>ch;cout<<endl;
+                  switch(ch)
+                 {case 1:
+                    allrecepinfo();recepinfo();    break;
+                  case 2:
+                    namerecepinfo();   break;
+                case 3:
+                    recepmenu();     break;
+                  default :
+                    recepinfo();    break;
+                 }
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void login()
+{
+    newscr("LOGIN");
+    int f=0;
+    string username;
+    try{
+        cout << "USER NAME   -  ";cin>>username;
+        string u=username.substr(0,3);
+        if(u.compare("adm")==0)
+            {
+             Admin a;
+             f=a.adminlogin(username);
+             if(f!=0)a.wadmin();
+            }
+        else if(u.compare("doc")==0)
+            {
+             Doctor d;
+             f=d.doctorlogin(username);
+             if(f!=0)d.wdoctor(f);
+            }
+        else if(u.compare("rcp")==0)
+            {
+             Recep d;
+             f=d.receplogin(username);
+             if(f!=0)d.wrecep(f);
+            }
+        // else cout<<"INVALID USERNAME";
+        else throw 3;
+        }catch(...){cout<<"\ninvalid username\n";getch();login();}
+    if(f==0)
+        {cout<<"\ninvalid username or password \n";getch();login();}
+}
+
+string enterpwd()
+{
+    int i=0;
+    char a[10];
+    while(i<10)
+    {
+        a[i]=getch();
+        if(a[i]==13)
+            break;
+        else if(a[i]==8||a[i]==127)
+            i--;
+        else
+        cout<<"*";
+        i++;
+    }
+    a[i]='\0';
+    //for(i=0;i<10;i++)cout<<a[i];
+    return a;
+}
+string mrms(char gender)
+{
+   if(gender=='m'||gender=='M')return "Mr. ";else return "Ms. ";
+}
+char entergender()
+{
+     int g=1;char gender;
+     while(g==1){cout<<"\tgender (m/f)\t-\t";
+        cin>>gender;if(gender=='m'||gender=='M'||gender=='f'||gender=='F')g=0;}
+        return gender;
+}
+
+
